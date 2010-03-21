@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+usage = "stalk <jobs.rb> [<priority>]"
+file = ARGV.shift or abort usage
+priority = ARGV.shift || :default
+
+require file
+
+puts "Running #{priority} priority jobs"
+
+Stalker.run priority
+
