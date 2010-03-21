@@ -7,6 +7,10 @@ priority :high do
 	job 'send.email' do |args|
 		puts "Sending email: #{args.inspect}"
 	end
+
+	job 'transform.image' do |args|
+		puts "Image transform"
+	end
 end
 
 priority :low do

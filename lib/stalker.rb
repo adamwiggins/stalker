@@ -13,23 +13,21 @@ module Stalker
 		@@handlers ||= {}
 		@@priority = p.to_sym
 		block.call
-		@priority = nil
+		@@priority = nil
 	end
 
 	def job(j, &block)
-		@priority ||= :default
+		@@priority ||= :default
 		@@handlers[@@priority] ||= {}
 		@@handlers[@@priority][j] = block
 	end
 
-	def run(priority)
-		loop do
-			beanstalk.watch(priority)
-			work_job(priority)
-		end
+	def work(priority)
+		beanstalk.watch(priority)
+		loop { work_one_job(priority) }
 	end
 
-	def work_job(priority)
+	def work_one_job(priority)
 		job = beanstalk.reserve
 		name, args = JSON.parse job.body
 		handler = @@handlers[priority.to_sym][name]
@@ -39,6 +37,10 @@ module Stalker
 	end
 
 	class NoSuchJob < RuntimeError; end
+
+	def jobs(priority)
+		@@handlers[priority.to_sym].keys
+	end
 
 	def find_priority(job)
 		@@handlers.each do |priority, jobs|

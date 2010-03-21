@@ -6,7 +6,7 @@ priority = ARGV.shift || :default
 
 require file
 
-puts "Running #{priority} priority jobs"
+puts "Working #{priority} priority jobs: [ #{Stalker.jobs(priority).join(' ')} ]"
 
-Stalker.run priority
+Stalker.work priority
 
