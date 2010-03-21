@@ -1,12 +1,13 @@
 #!/usr/bin/env ruby
 
-usage = "stalk <jobs.rb> [<priority>]"
+usage = "stalk <jobs.rb> [<priority>[,<priority>,..]]"
 file = ARGV.shift or abort usage
-priority = ARGV.shift || :default
+priorities = (ARGV.shift || 'all').split(',')
 
 require file
 
-puts "Working #{priority} priority jobs: [ #{Stalker.jobs(priority).join(' ')} ]"
+jobs = Stalker.jobs(priorities)
+puts "Working #{jobs.size} #{priorities.join(', ')} priority jobs: [ #{jobs.join(' ')} ]"
 
-Stalker.work priority
+Stalker.work priorities
 

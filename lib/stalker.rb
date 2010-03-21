@@ -11,44 +11,53 @@ module Stalker
 
 	def priority(p, &block)
 		@@handlers ||= {}
-		@@priority = p.to_sym
+		@@priority = p.to_s
 		block.call
 		@@priority = nil
 	end
 
 	def job(j, &block)
-		@@priority ||= :default
-		@@handlers[@@priority] ||= {}
-		@@handlers[@@priority][j] = block
+		@@priority ||= 'default'
+		@@priorities ||= {}
+		@@priorities[j] = @@priority
+
+		@@handlers[j] = block
 	end
 
-	def work(priority)
-		beanstalk.watch(priority)
-		loop { work_one_job(priority) }
+	def work(priorities=['all'])
+		if Array(priorities) == [ 'all' ]
+			priorities = @@priorities.values.uniq
+		end
+
+		beanstalk.list_tubes_watched.each { |tube| beanstalk.ignore(tube) }
+		priorities.each { |priority| beanstalk.watch(priority) }
+
+		loop do
+			work_one_job
+		end
 	end
 
-	def work_one_job(priority)
+	def work_one_job
 		job = beanstalk.reserve
 		name, args = JSON.parse job.body
-		handler = @@handlers[priority.to_sym][name]
-		raise "No #{priority} handler for #{name}" unless handler
+		handler = @@handlers[name]
+		raise "No such job as #{name}" unless handler
 		handler.call(args)
 		job.delete
 	end
 
 	class NoSuchJob < RuntimeError; end
 
-	def jobs(priority)
-		@@handlers[priority.to_sym].keys
+	def jobs(priorities=['all'])
+		jobs = []
+		@@priorities.each do |job, priority|
+			jobs << job if priorities == %w(all) or priorities.include? priority
+		end
+		jobs
 	end
 
 	def find_priority(job)
-		@@handlers.each do |priority, jobs|
-			jobs.keys.each do |j|
-				return priority if j == job
-			end
-		end
-		raise NoSuchJob, job
+		@@priorities[job] or raise(NoSuchJob, job)
 	end
 
 	def beanstalk
