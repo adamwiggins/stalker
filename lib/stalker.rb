@@ -46,6 +46,9 @@ module Stalker
 		raise(NoSuchJob, name) unless handler
 		handler.call(args)
 		job.delete
+	rescue => e
+		STDERR.puts exception_message(e)
+		job.bury
 	end
 
 	def jobs(priorities=['all'])
@@ -62,5 +65,16 @@ module Stalker
 
 	def beanstalk
 		@@beanstalk ||= Beanstalk::Pool.new([ 'localhost:11300' ])
+	end
+
+	def exception_message(e)
+		msg = [ "Exception #{e.class} -> #{e.message}" ]
+
+		base = File.expand_path(Dir.pwd) + '/'
+		e.backtrace.each do |t|
+			msg << "   #{File.expand_path(t).gsub(/#{base}/, '')}"
+		end
+
+		msg.join("\n")
 	end
 end
