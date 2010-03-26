@@ -1,5 +1,6 @@
 require 'beanstalk-client'
 require 'json'
+require 'uri'
 
 module Stalker
 	extend self
@@ -80,7 +81,19 @@ module Stalker
 	end
 
 	def beanstalk
-		@@beanstalk ||= Beanstalk::Pool.new([ 'localhost:11300' ])
+		@@beanstalk ||= Beanstalk::Pool.new([ beanstalk_host_and_port ])
+	end
+
+	def beanstalk_url
+		ENV['BEANSTALK_URL'] || 'beanstalk://localhost:11300/'
+	end
+
+	class BadURL < RuntimeError; end
+
+	def beanstalk_host_and_port
+		uri = URI.parse(beanstalk_url)
+		raise(BadURL, beanstalk_url) if uri.scheme != 'beanstalk'
+		return "#{uri.host}:#{uri.port}"
 	end
 
 	def exception_message(e)
