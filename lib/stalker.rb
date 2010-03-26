@@ -37,16 +37,16 @@ module Stalker
 		end
 	end
 
+	class NoSuchJob < RuntimeError; end
+
 	def work_one_job
 		job = beanstalk.reserve
 		name, args = JSON.parse job.body
 		handler = @@handlers[name]
-		raise "No such job as #{name}" unless handler
+		raise(NoSuchJob, name) unless handler
 		handler.call(args)
 		job.delete
 	end
-
-	class NoSuchJob < RuntimeError; end
 
 	def jobs(priorities=['all'])
 		jobs = []
