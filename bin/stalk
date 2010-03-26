@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require File.dirname(__FILE__) + '/../lib/stalker'
+
 usage = "stalk <jobs.rb> [<priority>[,<priority>,..]]"
 file = ARGV.shift or abort usage
 priorities = (ARGV.shift || 'all').split(',')

@@ -10,7 +10,6 @@ module Stalker
 	end
 
 	def priority(p, &block)
-		@@handlers ||= {}
 		@@priority = p.to_s
 		block.call
 		@@priority = nil
@@ -21,6 +20,7 @@ module Stalker
 		@@priorities ||= {}
 		@@priorities[j] = @@priority
 
+		@@handlers ||= {}
 		@@handlers[j] = block
 	end
 
@@ -59,7 +59,10 @@ module Stalker
 		jobs
 	end
 
+	class NoJobsDefined < RuntimeError; end
+
 	def find_priority(job)
+		raise NoJobsDefined unless defined?(@@priorities)
 		@@priorities[job] or raise(NoSuchJob, job)
 	end
 
