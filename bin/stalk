@@ -9,5 +9,10 @@ require file
 jobs = Stalker.jobs(priorities)
 puts "Working #{jobs.size} #{priorities.join(', ')} priority jobs: [ #{jobs.join(' ')} ]"
 
+trap('INT') do
+	puts "\rExiting"
+	exit
+end
+
 Stalker.work priorities
 
