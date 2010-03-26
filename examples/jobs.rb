@@ -5,7 +5,7 @@ include Stalker
 
 priority :high do
 	job 'send.email' do |args|
-		puts "Sending email: #{args.inspect}"
+		puts "Sending email to args['email']"
 	end
 
 	job 'transform.image' do |args|

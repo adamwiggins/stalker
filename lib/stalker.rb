@@ -42,6 +42,7 @@ module Stalker
 	def work_one_job
 		job = beanstalk.reserve
 		name, args = JSON.parse job.body
+		log_job(name, args)
 		handler = @@handlers[name]
 		raise(NoSuchJob, name) unless handler
 		handler.call(args)
@@ -49,6 +50,18 @@ module Stalker
 	rescue => e
 		STDERR.puts exception_message(e)
 		job.bury
+	end
+
+	def log_job(name, args)
+		args_flat = args.inject("") do |accum, (key,value)|
+			accum += "#{key}=#{value} "
+		end
+
+		log sprintf("%-15s :: #{args_flat}", name)
+	end
+
+	def log(msg)
+		puts "[#{Time.now}] #{msg}"
 	end
 
 	def jobs(priorities=['all'])
