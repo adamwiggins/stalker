@@ -2,19 +2,15 @@
 
 require File.dirname(__FILE__) + '/../lib/stalker'
 
-usage = "stalk <jobs.rb> [<priority>[,<priority>,..]]"
+usage = "stalk <jobs.rb> [<job>[,<job>,..]]"
 file = ARGV.shift or abort usage
-priorities = (ARGV.shift || 'all').split(',')
+jobs = ARGV.shift.split(',') rescue nil
 
 require file
-
-jobs = Stalker.jobs(priorities)
-puts "Working #{jobs.size} #{priorities.join(', ')} priority jobs: [ #{jobs.join(' ')} ]"
 
 trap('INT') do
 	puts "\rExiting"
 	exit
 end
 
-Stalker.work priorities
-
+Stalker.work jobs

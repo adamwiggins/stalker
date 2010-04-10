@@ -3,18 +3,14 @@ require 'stalker'
 
 include Stalker
 
-priority :high do
-	job 'send.email' do |args|
-		puts "Sending email to args['email']"
-	end
-
-	job 'transform.image' do |args|
-		puts "Image transform"
-	end
+job 'send.email' do |args|
+	log "Sending email to #{args['email']}"
 end
 
-priority :low do
-	job 'cleanup.strays' do |args|
-		puts "Cleaning up"
-	end
+job 'transform.image' do |args|
+	log "Image transform"
+end
+
+job 'cleanup.strays' do |args|
+	log "Cleaning up"
 end
