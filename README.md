@@ -51,14 +51,16 @@ Stalker:
 Now run a worker using the stalk binary:
 
     $ stalk jobs.rb
-    [Sat Apr 17 14:13:40 -0700 2010] Working 3 jobs  :: [ email.send post.cleanup.all post.cleanup ]
+    [Thu May 13 01:08:19 -0700 2010] Working 3 jobs: [ email.send post.cleanup.all post.cleanup ]
+    [Thu May 13 01:08:21 -0700 2010] -> send.email (email=hello@example.com)
+    [Thu May 13 01:08:21 -0700 2010] -> send.email finished in 31ms
 
-Stalker will log to stdout as it starts working each job.
+Stalker will log to stdout as it starts working each job, and then again when the job finishes including the ellapsed time in milliseconds.
 
 Filter to a list of jobs you wish to run with an argument:
 
     $ stalk jobs.rb post.cleanup.all,post.cleanup
-    [Sat Apr 17 14:13:40 -0700 2010] Working 2 jobs  :: [ post.cleanup.all post.cleanup ]
+    [Sat Apr 17 14:13:40 -0700 2010] Working 2 jobs: [ post.cleanup.all post.cleanup ]
 
 In a production environment you may run one or more high-priority workers (limited to short/urgent jobs) and any number of regular workers (working all jobs).  For example, two workers working just the email.send job, and four running all jobs:
 
