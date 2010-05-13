@@ -1,4 +1,4 @@
-$LOAD_PATH.unshift '../lib'
+$LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
 require 'stalker'
 
 Stalker.enqueue('send.email', :email => 'hello@example.com')

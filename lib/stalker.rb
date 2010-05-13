@@ -27,7 +27,7 @@ module Stalker
 			raise(NoSuchJob, job) unless @@handlers[job]
 		end
 
-		log "Working #{jobs.size} jobs  :: [ #{jobs.join(' ')} ]"
+		log "Working #{jobs.size} jobs: [ #{jobs.join(' ')} ]"
 
 		beanstalk.list_tubes_watched.each { |tube| beanstalk.ignore(tube) }
 		jobs.each { |job| beanstalk.watch(job) }
@@ -40,22 +40,34 @@ module Stalker
 	def work_one_job
 		job = beanstalk.reserve
 		name, args = JSON.parse job.body
-		log_job(name, args)
+		log_job_begin(name, args)
 		handler = @@handlers[name]
 		raise(NoSuchJob, name) unless handler
 		handler.call(args)
 		job.delete
+		log_job_end(name)
 	rescue => e
 		STDERR.puts exception_message(e)
 		job.bury
 	end
 
-	def log_job(name, args)
-		args_flat = args.inject("") do |accum, (key,value)|
-			accum += "#{key}=#{value} "
+	def log_job_begin(name, args)
+		args_flat = unless args.empty?
+			'(' + args.inject([]) do |accum, (key,value)|
+				accum << "#{key}=#{value}"
+			end.join(' ') + ')'
+		else
+			''
 		end
 
-		log sprintf("%-15s :: #{args_flat}", name)
+		log [ "->", name, args_flat ].join(' ')
+		@job_begun = Time.now
+	end
+
+	def log_job_end(name)
+		ellapsed = Time.now - @job_begun
+		ms = (ellapsed.to_f * 1000).to_i
+		log "-> #{name} finished in #{ms}ms"
 	end
 
 	def log(msg)
