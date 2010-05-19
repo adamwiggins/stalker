@@ -35,6 +35,8 @@ module Stalker
 		loop do
 			work_one_job
 		end
+	rescue Beanstalk::NotConnected => e
+		failed_connection(e)
 	end
 
 	def work_one_job
@@ -46,9 +48,20 @@ module Stalker
 		handler.call(args)
 		job.delete
 		log_job_end(name)
+	rescue Beanstalk::NotConnected => e
+		failed_connection(e)
+	rescue SystemExit
+		raise
 	rescue => e
 		STDERR.puts exception_message(e)
-		job.bury
+		job.bury rescue nil
+	end
+
+	def failed_connection(e)
+		STDERR.puts exception_message(e)
+		STDERR.puts "*** Failed connection to #{beanstalk_url}"
+		STDERR.puts "*** Check that beanstalkd is running (or set a different BEANSTALK_URL)"
+		exit 1
 	end
 
 	def log_job_begin(name, args)
