@@ -55,6 +55,7 @@ module Stalker
 	rescue => e
 		STDERR.puts exception_message(e)
 		job.bury rescue nil
+		log_job_end(name, 'failed')
 	end
 
 	def failed_connection(e)
@@ -77,10 +78,10 @@ module Stalker
 		@job_begun = Time.now
 	end
 
-	def log_job_end(name)
+	def log_job_end(name, type="finished")
 		ellapsed = Time.now - @job_begun
 		ms = (ellapsed.to_f * 1000).to_i
-		log "-> #{name} finished in #{ms}ms"
+		log "-> #{name} #{type} in #{ms}ms"
 	end
 
 	def log(msg)
