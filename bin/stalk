@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+STDERR.sync = STDOUT.sync = true
+
 require File.dirname(__FILE__) + '/../lib/stalker'
 
 usage = "stalk <jobs.rb> [<job>[,<job>,..]]"
