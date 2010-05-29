@@ -93,7 +93,7 @@ module Stalker
 	end
 
 	def beanstalk_url
-		ENV['BEANSTALK_URL'] || 'beanstalk://localhost:11300/'
+		ENV['BEANSTALK_URL'] || 'beanstalk://localhost/'
 	end
 
 	class BadURL < RuntimeError; end
@@ -101,7 +101,7 @@ module Stalker
 	def beanstalk_host_and_port
 		uri = URI.parse(beanstalk_url)
 		raise(BadURL, beanstalk_url) if uri.scheme != 'beanstalk'
-		return "#{uri.host}:#{uri.port}"
+		return "#{uri.host}:#{uri.port || 11300}"
 	end
 
 	def exception_message(e)
