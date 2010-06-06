@@ -29,8 +29,11 @@ module Stalker
 
 		log "Working #{jobs.size} jobs: [ #{jobs.join(' ')} ]"
 
-		beanstalk.list_tubes_watched.each { |tube| beanstalk.ignore(tube) }
 		jobs.each { |job| beanstalk.watch(job) }
+
+    beanstalk.list_tubes_watched.each do |server, tubes|
+      tubes.each { |tube| beanstalk.ignore(tube) unless jobs.include?(tube) }
+    end
 
 		loop do
 			work_one_job
