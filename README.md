@@ -81,6 +81,8 @@ Meta
 
 Created by Adam Wiggins
 
+Patches from Jamie Cobbett and Scott Water
+
 Heavily inspired by [Minion](http://github.com/orionz/minion) by Orion Henry
 
 Released under the MIT License: http://www.opensource.org/licenses/mit-license.php
