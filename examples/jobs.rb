@@ -1,8 +1,3 @@
-$LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
-require 'stalker'
-
-include Stalker
-
 job 'send.email' do |args|
 	log "Sending email to #{args['email']}"
 end
