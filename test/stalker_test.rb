@@ -19,6 +19,28 @@ class StalkerTest < Test::Unit::TestCase
 		Stalker.enqueue('my.job', :val => val)
 		Stalker.prep
 		Stalker.work_one_job
-		assert_equal val, $result
+		assert_equal $result, val
+	end
+
+	test "use memcache lock" do
+		require 'memcached'
+		Stalker.cache = Memcached.new
+
+		Stalker.job('lock.job', :lock_for => 1) { |args| $result = 999 }
+		3.times { Stalker.enqueue('lock.job') }
+		Stalker.prep
+
+		$result = -1
+		Stalker.work_one_job
+		assert_equal 999, $result
+
+		$result = -1
+		Stalker.work_one_job
+		assert_equal -1, $result
+
+		sleep 1.1
+		$result = -1
+		Stalker.work_one_job
+		assert_equal 999, $result
 	end
 end

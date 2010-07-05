@@ -12,9 +12,11 @@ module Stalker
 		failed_connection(e)
 	end
 
-	def job(j, &block)
+	def job(j, opts={}, &block)
 		@@handlers ||= {}
 		@@handlers[j] = block
+		@@lock_fors ||= {}
+		@@lock_fors[j] = opts[:lock_for]
 	end
 
 	class NoJobsDefined < RuntimeError; end
@@ -48,6 +50,13 @@ module Stalker
 	def work_one_job
 		job = beanstalk.reserve
 		name, args = JSON.parse job.body
+
+		if skip?(name, job.body)
+			log_job_skipped(name, args)
+			job.delete
+			return
+		end
+
 		log_job_begin(name, args)
 		handler = @@handlers[name]
 		raise(NoSuchJob, name) unless handler
@@ -90,6 +99,18 @@ module Stalker
 		log "-> #{name} #{type} in #{ms}ms"
 	end
 
+	def log_job_skipped(name, args)
+		args_flat = unless args.empty?
+			'(' + args.inject([]) do |accum, (key,value)|
+				accum << "#{key}=#{value}"
+			end.join(' ') + ')'
+		else
+			''
+		end
+
+		log [ "skipping", name, args_flat, "- executed less than #{@@lock_fors[name]}s ago" ].join(' ')
+	end
+
 	def log(msg)
 		puts "[#{Time.now}] #{msg}"
 	end
@@ -123,6 +144,35 @@ module Stalker
 
 	def all_jobs
 		@@handlers.keys
+	end
+
+	def cache=(cache)
+		@@cache = cache
+	end
+
+	class CacheNotSet < RuntimeError; end
+
+	def cache
+		@@cache
+	rescue NameError
+		raise CacheNotSet, "No cache object provided, try: Stalker.cache = Memcached.new"
+	end
+
+	def lock(name, secs)
+		res = cache.add("stalker:#{name}", '1', secs)
+		return true if res.nil?   # for memcached gem
+		res.match(/^STORED/)      # for memcache-client gem
+	rescue Memcached::ConnectionDataExists, Memcached::NotStored
+		false                     # for memcached gem
+	end
+
+	def skip?(name, signature)
+		return false unless lock_for = @@lock_fors[name]
+		if lock(signature, lock_for)
+			return false
+		else
+			return true
+		end
 	end
 
 	def clear!
