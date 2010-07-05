@@ -76,6 +76,17 @@ Tidbits
 * The stalk binary is just for convenience, you can also run a worker with a straight Ruby command:
     $ ruby -r jobs -e Stalker.work
 
+Running the tests
+-----------------
+
+If you wish to hack on Stalker, install these extra gems:
+
+    $ gem install contest mocha turn
+
+Run the tests:
+
+    $ turn
+
 Meta
 ----
 
