@@ -18,7 +18,7 @@ module Stalker
 	class NoJobsDefined < RuntimeError; end
 	class NoSuchJob < RuntimeError; end
 
-	def work(jobs=nil)
+	def prep(jobs=nil)
 		raise NoJobsDefined unless defined?(@@handlers)
 
 		jobs ||= all_jobs
@@ -34,12 +34,13 @@ module Stalker
 		beanstalk.list_tubes_watched.each do |server, tubes|
 			tubes.each { |tube| beanstalk.ignore(tube) unless jobs.include?(tube) }
 		end
-
-		loop do
-			work_one_job
-		end
 	rescue Beanstalk::NotConnected => e
 		failed_connection(e)
+	end
+
+	def work(jobs=nil)
+		prep(jobs)
+		loop { work_one_job }
 	end
 
 	def work_one_job
@@ -120,5 +121,9 @@ module Stalker
 
 	def all_jobs
 		@@handlers.keys
+	end
+
+	def clear!
+		@@handlers = nil
 	end
 end
