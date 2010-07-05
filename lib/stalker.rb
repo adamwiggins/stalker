@@ -8,6 +8,8 @@ module Stalker
 	def enqueue(job, args={})
 		beanstalk.use job
 		beanstalk.put [ job, args ].to_json
+	rescue Beanstalk::NotConnected => e
+		failed_connection(e)
 	end
 
 	def job(j, &block)
