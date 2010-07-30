@@ -92,7 +92,7 @@ Meta
 
 Created by Adam Wiggins
 
-Patches from Jamie Cobbett and Scott Water
+Patches from Jamie Cobbett, Scott Water, and Keith Rarick
 
 Heavily inspired by [Minion](http://github.com/orionz/minion) by Orion Henry
 
