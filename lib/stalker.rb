@@ -5,9 +5,12 @@ require 'uri'
 module Stalker
 	extend self
 
-	def enqueue(job, args={})
+	def enqueue(job, args={}, opts={})
+		pri   = opts[:pri]   || 65536
+		delay = opts[:delay] || 0
+		ttr   = opts[:ttr]   || 120
 		beanstalk.use job
-		beanstalk.put [ job, args ].to_json
+		beanstalk.put [ job, args ].to_json, pri, delay, ttr
 	rescue Beanstalk::NotConnected => e
 		failed_connection(e)
 	end
