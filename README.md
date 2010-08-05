@@ -101,7 +101,7 @@ Meta
 
 Created by Adam Wiggins
 
-Patches from Jamie Cobbett, Scott Water, and Keith Rarick
+Patches from Jamie Cobbett, Scott Water, Keith Rarick, Mark McGranaghan
 
 Heavily inspired by [Minion](http://github.com/orionz/minion) by Orion Henry
 
