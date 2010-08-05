@@ -20,6 +20,10 @@ module Stalker
 		@@handlers[j] = block
 	end
 
+	def error(&blk)
+		@@error_handler = blk
+	end
+
 	class NoJobsDefined < RuntimeError; end
 	class NoSuchJob < RuntimeError; end
 
@@ -62,9 +66,10 @@ module Stalker
 	rescue SystemExit
 		raise
 	rescue => e
-		STDERR.puts exception_message(e)
+		log exception_message(e)
 		job.bury rescue nil
 		log_job_end(name, 'failed')
+		error_handler.call(e) if error_handler
 	end
 
 	def failed_connection(e)
@@ -128,7 +133,12 @@ module Stalker
 		@@handlers.keys
 	end
 
+	def error_handler
+		@@error_handler
+	end
+
 	def clear!
 		@@handlers = nil
+		@@error_handler = nil
 	end
 end

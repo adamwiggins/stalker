@@ -67,6 +67,15 @@ In a production environment you may run one or more high-priority workers (limit
     $ for i in 1 2; do stalk jobs.rb email.send > log/urgent-worker.log 2>&1; end
     $ for i in 1 2 3 4; do stalk jobs.rb > log/worker.log 2>&1; end
 
+Error Handling
+-------------
+
+If you include an `error` block in your jobs definition, that block will be invoked when a worker encounters an error. You might use this to report errors to an external monitoring service:
+
+    error do |e|
+       Exceptional.handle(e)
+    end
+
 Tidbits
 -------
 

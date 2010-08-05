@@ -11,6 +11,7 @@ class StalkerTest < Test::Unit::TestCase
 	setup do
 		Stalker.clear!
 		$result = -1
+		$handled = false
 	end
 
 	test "enqueue and work a job" do
@@ -20,5 +21,22 @@ class StalkerTest < Test::Unit::TestCase
 		Stalker.prep
 		Stalker.work_one_job
 		assert_equal val, $result
+	end
+
+	test "invoke error handler when defined" do
+		Stalker.error { |e| $handled = true }
+		Stalker.job('my.job') { fail }
+		Stalker.enqueue('my.job')
+		Stalker.prep
+		Stalker.work_one_job
+		assert_equal true, $handled
+	end
+
+	test "continue working when error handler not defined" do
+		Stalker.job('my.job') { fail }
+		Stalker.enqueue('my.job')
+		Stalker.prep
+		Stalker.work_one_job
+		assert_equal false, $handled
 	end
 end
