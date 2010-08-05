@@ -66,16 +66,16 @@ module Stalker
 	rescue SystemExit
 		raise
 	rescue => e
-		log exception_message(e)
+		log_error exception_message(e)
 		job.bury rescue nil
 		log_job_end(name, 'failed')
 		error_handler.call(e) if error_handler
 	end
 
 	def failed_connection(e)
-		STDERR.puts exception_message(e)
-		STDERR.puts "*** Failed connection to #{beanstalk_url}"
-		STDERR.puts "*** Check that beanstalkd is running (or set a different BEANSTALK_URL)"
+		log_error exception_message(e)
+		log_error "*** Failed connection to #{beanstalk_url}"
+		log_error "*** Check that beanstalkd is running (or set a different BEANSTALK_URL)"
 		exit 1
 	end
 
@@ -100,6 +100,10 @@ module Stalker
 
 	def log(msg)
 		puts "[#{Time.now}] #{msg}"
+	end
+
+	def log_error(msg)
+		STDERR.puts msg
 	end
 
 	def beanstalk

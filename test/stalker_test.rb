@@ -3,8 +3,8 @@ require 'contest'
 require 'mocha'
 
 module Stalker
-	def log(msg)
-	end
+	def log(msg); end
+	def log_error(msg); end
 end
 
 class StalkerTest < Test::Unit::TestCase
