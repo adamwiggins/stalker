@@ -29,6 +29,7 @@ module Stalker
 
 	def prep(jobs=nil)
 		raise NoJobsDefined unless defined?(@@handlers)
+		@@error_handler = nil unless defined?(@@error_handler)
 
 		jobs ||= all_jobs
 
