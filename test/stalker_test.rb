@@ -39,4 +39,13 @@ class StalkerTest < Test::Unit::TestCase
 		Stalker.work_one_job
 		assert_equal false, $handled
 	end
+
+	test "exception raised one second before beanstalk ttr reached" do
+		Stalker.error { |e| $handled = e.class }
+		Stalker.job('my.job') { sleep(3); $handled = "didn't time out" }
+		Stalker.enqueue('my.job', {}, :ttr => 2)
+		Stalker.prep
+		Stalker.work_one_job
+		assert_equal Stalker::JobTimeout, $handled
+	end
 end

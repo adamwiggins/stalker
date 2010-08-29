@@ -1,6 +1,7 @@
 require 'beanstalk-client'
 require 'json'
 require 'uri'
+require 'timeout'
 
 module Stalker
 	extend self
@@ -53,13 +54,23 @@ module Stalker
 		loop { work_one_job }
 	end
 
+	class JobTimeout < RuntimeError; end
+
 	def work_one_job
 		job = beanstalk.reserve
 		name, args = JSON.parse job.body
 		log_job_begin(name, args)
 		handler = @@handlers[name]
 		raise(NoSuchJob, name) unless handler
-		handler.call(args)
+
+		begin
+			Timeout::timeout(job.ttr - 1) do
+				handler.call(args)
+			end
+		rescue Timeout::Error
+			raise JobTimeout, "#{name} hit #{job.ttr-1}s timeout"
+		end
+
 		job.delete
 		log_job_end(name)
 	rescue Beanstalk::NotConnected => e
