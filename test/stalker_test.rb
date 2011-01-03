@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../lib/stalker'
+require File.expand_path('../../lib/stalker', __FILE__)
 require 'contest'
 require 'mocha'
 
