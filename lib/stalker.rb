@@ -105,18 +105,18 @@ module Stalker
 			''
 		end
 
-		log [ "->", name, args_flat ].join(' ')
+		log [ "Working", name, args_flat ].join(' ')
 		@job_begun = Time.now
 	end
 
-	def log_job_end(name, type="finished")
+	def log_job_end(name, failed=false)
 		ellapsed = Time.now - @job_begun
 		ms = (ellapsed.to_f * 1000).to_i
-		log "-> #{name} #{type} in #{ms}ms"
+		log "Finished #{name} in #{ms}ms #{failed ? ' (failed)' : ''}"
 	end
 
 	def log(msg)
-		puts "[#{Time.now}] #{msg}"
+		puts msg
 	end
 
 	def log_error(msg)
