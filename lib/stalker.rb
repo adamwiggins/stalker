@@ -6,6 +6,11 @@ require 'timeout'
 module Stalker
 	extend self
 
+	def connect(url)
+		@@url = url
+		beanstalk
+	end
+
 	def enqueue(job, args={}, opts={})
 		pri   = opts[:pri]   || 65536
 		delay = opts[:delay] || 0
@@ -123,6 +128,7 @@ module Stalker
 	end
 
 	def beanstalk_url
+		return @@url if defined?(@@url) and @@url
 		ENV['BEANSTALK_URL'] || 'beanstalk://localhost/'
 	end
 
