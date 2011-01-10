@@ -56,7 +56,10 @@ module Stalker
 
 	def work(jobs=nil)
 		prep(jobs)
-		loop { work_one_job }
+		loop do 
+		  work_one_job 
+		  sleep 15 #thrashing the cpu without this... :(
+		end
 	end
 
 	class JobTimeout < RuntimeError; end
