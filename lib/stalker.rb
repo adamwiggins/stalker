@@ -15,6 +15,7 @@ module Stalker
 		pri   = opts[:pri]   || 65536
 		delay = opts[:delay] || 0
 		ttr   = opts[:ttr]   || 120
+		infinite = opts[:infinite] || false
 		beanstalk.use job
 		beanstalk.put [ job, args ].to_json, pri, delay, ttr
 	rescue Beanstalk::NotConnected => e
@@ -68,12 +69,14 @@ module Stalker
 		handler = @@handlers[name]
 		raise(NoSuchJob, name) unless handler
 
-		begin
-			Timeout::timeout(job.ttr - 1) do
-				handler.call(args)
-			end
-		rescue Timeout::Error
-			raise JobTimeout, "#{name} hit #{job.ttr-1}s timeout"
+    if !infinite
+		  begin
+  			Timeout::timeout(job.ttr - 1) do
+  				handler.call(args)
+  			end
+  		rescue Timeout::Error
+  			raise JobTimeout, "#{name} hit #{job.ttr-1}s timeout"
+  		end
 		end
 
 		job.delete
