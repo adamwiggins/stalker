@@ -26,9 +26,9 @@ module Stalker
 		@@handlers[j] = block
 	end
 
-  def always(&block)
-    @@always_handlers ||= []
-    @@always_handlers << block
+  def before(&block)
+    @@before_handlers ||= []
+    @@before_handlers << block
   end
 
 	def error(&blk)
@@ -75,7 +75,7 @@ module Stalker
 
 		begin
 			Timeout::timeout(job.ttr - 1) do
-        @@always_handlers && @@always_handlers.each do |block|
+        @@before_handlers && @@before_handlers.each do |block|
           block.call(name)
         end
 				handler.call(args)
@@ -169,7 +169,7 @@ module Stalker
 
 	def clear!
 		@@handlers = nil
-    @@always_handlers = nil
+    @@before_handlers = nil
 		@@error_handler = nil
 	end
 end
