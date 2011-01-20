@@ -48,4 +48,42 @@ class StalkerTest < Test::Unit::TestCase
 		Stalker.work_one_job
 		assert_equal Stalker::JobTimeout, $handled
 	end
+
+	test "before filter gets run first" do
+		Stalker.before { |name| $flag = "i_was_here" }
+		Stalker.job('my.job') { |args| $handled = ($flag == 'i_was_here') }
+		Stalker.enqueue('my.job')
+		Stalker.prep
+		Stalker.work_one_job
+		assert_equal true, $handled
+	end
+
+	test "before filter passes the name of the job" do
+		Stalker.before { |name| $jobname = name }
+		Stalker.job('my.job') { true }
+		Stalker.enqueue('my.job')
+		Stalker.prep
+		Stalker.work_one_job
+		assert_equal 'my.job', $jobname
+	end
+
+	test "before filter can pass an instance var" do
+		Stalker.before { |name| @foo = "hello" }
+		Stalker.job('my.job') { |args| $handled = (@foo == "hello") }
+		Stalker.enqueue('my.job')
+		Stalker.prep
+		Stalker.work_one_job
+		assert_equal true, $handled
+	end
+
+	test "before filter invokes error handler when defined" do
+		Stalker.error { |e| $handled = true }
+		Stalker.before { |name| fail }
+		Stalker.job('my.job') {	}
+		Stalker.enqueue('my.job')
+		Stalker.prep
+		Stalker.work_one_job
+		assert_equal true, $handled
+	end
+
 end
