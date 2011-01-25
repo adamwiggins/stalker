@@ -134,7 +134,7 @@ module Stalker
 	end
 
 	def beanstalk
-		@@beanstalk ||= Beanstalk::Pool.new([ beanstalk_host_and_port ])
+		@@beanstalk ||= Beanstalk::Pool.new(beanstalk_addresses)
 	end
 
 	def beanstalk_url
@@ -144,10 +144,15 @@ module Stalker
 
 	class BadURL < RuntimeError; end
 
-	def beanstalk_host_and_port
-		uri = URI.parse(beanstalk_url)
-		raise(BadURL, beanstalk_url) if uri.scheme != 'beanstalk'
-		return "#{uri.host}:#{uri.port || 11300}"
+  def beanstalk_addresses
+    uris = beanstalk_url.split(/[\s,]+/)
+    uris.map {|uri| beanstalk_host_and_port(uri)}
+  end
+
+	def beanstalk_host_and_port(uri_string)
+		uri = URI.parse(uri_string)
+		raise(BadURL, uri_string) if uri.scheme != 'beanstalk'
+		"#{uri.host}:#{uri.port || 11300}"
 	end
 
 	def exception_message(e)
