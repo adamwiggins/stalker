@@ -12,6 +12,7 @@ class StalkerTest < Test::Unit::TestCase
 		Stalker.clear!
 		$result = -1
 		$handled = false
+	  ENV['BEANSTALK_URL'] = ""
 	end
 
 	test "enqueue and work a job" do
@@ -77,7 +78,7 @@ class StalkerTest < Test::Unit::TestCase
 	end
 
 	test "before filter invokes error handler when defined" do
-		Stalker.error { |e| $handled = true }
+		Stalker.error { |e| $handled = true   }
 		Stalker.before { |name| fail }
 		Stalker.job('my.job') {	}
 		Stalker.enqueue('my.job')
@@ -85,5 +86,18 @@ class StalkerTest < Test::Unit::TestCase
 		Stalker.work_one_job
 		assert_equal true, $handled
 	end
+	
+  test "parse BEANSTALK_URL" do
+    ENV['BEANSTALK_URL'] = "beanstalk://localhost:12300"
+    assert_equal Stalker.beanstalk_addresses, ["localhost:12300"]
+    ENV['BEANSTALK_URL'] = "beanstalk://localhost:12300/, beanstalk://localhost:12301/"
+    assert_equal Stalker.beanstalk_addresses, ["localhost:12300","localhost:12301"]
+    ENV['BEANSTALK_URL'] = "beanstalk://localhost:12300   beanstalk://localhost:12301"
+    assert_equal Stalker.beanstalk_addresses, ["localhost:12300","localhost:12301"]
+    ENV['BEANSTALK_URL'] = "beanstalk://localhost:12300, http://localhost:12301"
+    assert_raise Stalker::BadURL do
+      Stalker.beanstalk_addresses 
+    end
+  end
 
 end

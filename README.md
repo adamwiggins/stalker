@@ -90,7 +90,7 @@ Tidbits
 
 * Jobs are serialized as JSON, so you should stick to strings, integers, arrays, and hashes as arguments to jobs.  e.g. don't pass full Ruby objects - use something like an ActiveRecord/MongoMapper/CouchRest id instead.
 * Because there are no class definitions associated with jobs, you can queue jobs from anywhere without needing to include your full app's environment.
-* If you need to change the location of your Beanstalk from the default (localhost:11300), set BEANSTALK_URL in your environment, e.g. export BEANSTALK_URL=beanstalk://example.com:11300/
+* If you need to change the location of your Beanstalk from the default (localhost:11300), set BEANSTALK_URL in your environment, e.g. export BEANSTALK_URL=beanstalk://example.com:11300/. You can specify multiple beanstalk servers, separated by whitespace or comma, e.g. export BEANSTALK_URL="beanstalk://b1.example.com:11300/, beanstalk://b2.example.com:11300/"
 * The stalk binary is just for convenience, you can also run a worker with a straight Ruby command:
     $ ruby -r jobs -e Stalker.work
 
