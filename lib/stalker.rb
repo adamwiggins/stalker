@@ -11,15 +11,15 @@ module Stalker
     beanstalk
   end
 
-  def enqueue(job, args={}, opts={})
-    pri   = opts[:pri]   || 65536
-    delay = opts[:delay] || 0
-    ttr   = opts[:ttr]   || 120
-    beanstalk.use job
-    beanstalk.put [ job, args ].to_json, pri, delay, ttr
-  rescue Beanstalk::NotConnected => e
-    failed_connection(e)
-  end
+	def enqueue(job, args={}, opts={})
+		pri   = opts[:pri]   || 65536
+		delay = [0, opts[:delay].to_i].max  
+		ttr   = opts[:ttr]   || 120
+		beanstalk.use job
+		beanstalk.put [ job, args ].to_json, pri, delay, ttr
+	rescue Beanstalk::NotConnected => e
+		failed_connection(e)
+	end
 
   def job(j, &block)
     @@handlers ||= {}
