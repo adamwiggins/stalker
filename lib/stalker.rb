@@ -95,7 +95,7 @@ module Stalker
   rescue => e
     log_error exception_message(e)
     job.bury rescue nil
-    log_job_end(name, 'failed')
+		log_job_end(name, 'failed') if @job_begun
     if error_handler
       if error_handler.arity == 1
         error_handler.call(e)
