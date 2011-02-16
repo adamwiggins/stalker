@@ -14,6 +14,14 @@ class StalkerTest < Test::Unit::TestCase
 		$handled = false
 	end
 
+	def with_an_error_handler
+		Stalker.error do |job_name, args, e|
+			$handled = e.class
+			$job_name = job_name
+			$job_args = args
+		end
+	end
+
 	test "enqueue and work a job" do
 		val = rand(999999)
 		Stalker.job('my.job') { |args| $result = args['val'] }
@@ -24,12 +32,14 @@ class StalkerTest < Test::Unit::TestCase
 	end
 
 	test "invoke error handler when defined" do
-		Stalker.error { |e| $handled = true }
-		Stalker.job('my.job') { fail }
-		Stalker.enqueue('my.job')
+		with_an_error_handler
+		Stalker.job('my.job') { |args| fail }
+		Stalker.enqueue('my.job', :foo => 123)
 		Stalker.prep
 		Stalker.work_one_job
-		assert_equal true, $handled
+		assert $handled
+		assert_equal 'my.job', $job_name
+		assert_equal({'foo' => 123}, $job_args)
 	end
 
 	test "continue working when error handler not defined" do
@@ -41,7 +51,7 @@ class StalkerTest < Test::Unit::TestCase
 	end
 
 	test "exception raised one second before beanstalk ttr reached" do
-		Stalker.error { |e| $handled = e.class }
+		with_an_error_handler
 		Stalker.job('my.job') { sleep(3); $handled = "didn't time out" }
 		Stalker.enqueue('my.job', {}, :ttr => 2)
 		Stalker.prep
@@ -77,13 +87,15 @@ class StalkerTest < Test::Unit::TestCase
 	end
 
 	test "before filter invokes error handler when defined" do
-		Stalker.error { |e| $handled = true }
+		with_an_error_handler
 		Stalker.before { |name| fail }
 		Stalker.job('my.job') {	}
-		Stalker.enqueue('my.job')
+		Stalker.enqueue('my.job', :foo => 123)
 		Stalker.prep
 		Stalker.work_one_job
-		assert_equal true, $handled
+		assert $handled
+		assert_equal 'my.job', $job_name
+		assert_equal({'foo' => 123}, $job_args)
 	end
 
 end

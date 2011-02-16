@@ -96,7 +96,7 @@ module Stalker
 		log_error exception_message(e)
 		job.bury rescue nil
 		log_job_end(name, 'failed')
-		error_handler.call(e) if error_handler
+		error_handler.call(name, args, e) if error_handler
 	end
 
 	def failed_connection(e)
