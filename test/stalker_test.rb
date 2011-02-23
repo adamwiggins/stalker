@@ -15,7 +15,7 @@ class StalkerTest < Test::Unit::TestCase
 	end
 
 	def with_an_error_handler
-		Stalker.error do |job_name, args, e|
+		Stalker.error do |e, job_name, args|
 			$handled = e.class
 			$job_name = job_name
 			$job_args = args
@@ -40,6 +40,16 @@ class StalkerTest < Test::Unit::TestCase
 		assert $handled
 		assert_equal 'my.job', $job_name
 		assert_equal({'foo' => 123}, $job_args)
+	end
+
+	test "should be compatible with legacy error handlers" do
+		exception = StandardError.new("Oh my, the job has failed!")
+		Stalker.error { |e| $handled = e }
+		Stalker.job('my.job') { |args| raise exception }
+		Stalker.enqueue('my.job', :foo => 123)
+		Stalker.prep
+		Stalker.work_one_job
+		assert_equal exception, $handled
 	end
 
 	test "continue working when error handler not defined" do
