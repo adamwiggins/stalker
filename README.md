@@ -72,7 +72,7 @@ Error Handling
 
 If you include an `error` block in your jobs definition, that block will be invoked when a worker encounters an error. You might use this to report errors to an external monitoring service:
 
-    error do |e, job_name, args|
+    error do |e, job, args|
       Exceptional.handle(e)
     end
 
@@ -110,7 +110,7 @@ Meta
 
 Created by Adam Wiggins
 
-Patches from Jamie Cobbett, Scott Water, Keith Rarick, Mark McGranaghan, Sean Walberg
+Patches from Jamie Cobbett, Scott Water, Keith Rarick, Mark McGranaghan, Sean Walberg, Adam Pohorecki
 
 Heavily inspired by [Minion](http://github.com/orionz/minion) by Orion Henry
 
