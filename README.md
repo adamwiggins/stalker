@@ -99,11 +99,11 @@ Running the tests
 
 If you wish to hack on Stalker, install these extra gems:
 
-    $ gem install contest mocha turn
+    $ gem install contest mocha
 
-Run the tests:
+Make sure you have a beanstalkd running, then run the tests:
 
-    $ turn
+    $ ruby test/stalker_test.rb
 
 Meta
 ----
