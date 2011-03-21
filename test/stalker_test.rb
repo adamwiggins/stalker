@@ -3,7 +3,7 @@ require 'contest'
 require 'mocha'
 
 module Stalker
-  def log(msg); end
+  def log_info(msg); end
   def log_error(msg); end
 end
 

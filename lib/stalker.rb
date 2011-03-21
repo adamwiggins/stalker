@@ -48,7 +48,7 @@ module Stalker
       raise(NoSuchJob, job) unless @@handlers[job]
     end
 
-    log "Working #{jobs.size} jobs: [ #{jobs.join(' ')} ]"
+    log_info "Working #{jobs.size} jobs: [ #{jobs.join(' ')} ]"
 
     jobs.each { |job| beanstalk.watch(job) }
 
@@ -121,17 +121,17 @@ module Stalker
       ''
     end
 
-    log [ "Working", name, args_flat ].join(' ')
+    log_info [ "Working", name, args_flat ].join(' ')
     @job_begun = Time.now
   end
 
   def log_job_end(name, failed=false)
     ellapsed = Time.now - @job_begun
     ms = (ellapsed.to_f * 1000).to_i
-    log "Finished #{name} in #{ms}ms #{failed ? ' (failed)' : ''}"
+    log_info "Finished #{name} in #{ms}ms #{failed ? ' (failed)' : ''}"
   end
 
-  def log(msg)
+  def log_info(msg)
     puts msg
   end
 
