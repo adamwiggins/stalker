@@ -108,13 +108,13 @@ Make sure you have a beanstalkd running, then run the tests:
 Meta
 ----
 
-Created by Adam Wiggins
+Created by [Adam Wiggins](https://github.com/adamwiggins)
 
-Patches from Jamie Cobbett, Scott Water, Keith Rarick, Mark McGranaghan, Sean Walberg, Adam Pohorecki
+Patches from Jamie Cobbett, Scott Water, Keith Rarick, Mark McGranaghan, Sean Walberg, Adam Pohorecki, Han Kessels
 
-Heavily inspired by [Minion](http://github.com/orionz/minion) by Orion Henry
+Heavily inspired by [Minion](https://github.com/orionz/minion) by Orion Henry
 
 Released under the MIT License: http://www.opensource.org/licenses/mit-license.php
 
-http://github.com/adamwiggins/stalker
+https://github.com/han/stalker
 
