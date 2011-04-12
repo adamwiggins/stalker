@@ -1,3 +1,8 @@
+This repo is unmaintained
+-------------------------
+
+Please go to the new [official fork](http://github.com/han/stalker)
+
 Stalker - a job queueing DSL for Beanstalk
 ==========================================
 
