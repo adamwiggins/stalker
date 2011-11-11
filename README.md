@@ -64,8 +64,8 @@ Filter to a list of jobs you wish to run with an argument:
 
 In a production environment you may run one or more high-priority workers (limited to short/urgent jobs) and any number of regular workers (working all jobs).  For example, two workers working just the email.send job, and four running all jobs:
 
-    $ for i in 1 2; do stalk jobs.rb email.send > log/urgent-worker.log 2>&1; end
-    $ for i in 1 2 3 4; do stalk jobs.rb > log/worker.log 2>&1; end
+    $ for i in 1 2; do stalk jobs.rb email.send > log/urgent-worker.log 2>&1; done
+    $ for i in 1 2 3 4; do stalk jobs.rb > log/worker.log 2>&1; done
 
 Error Handling
 -------------
