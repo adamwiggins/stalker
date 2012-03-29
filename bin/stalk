@@ -3,7 +3,7 @@
 STDERR.sync = STDOUT.sync = true
 
 require File.expand_path('../../lib/stalker', __FILE__)
-include Stalker
+extend Stalker
 
 usage = "stalk <jobs.rb> [<job>[,<job>,..]]"
 file = ARGV.shift or abort usage
