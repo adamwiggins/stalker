@@ -28,7 +28,7 @@ In a standalone file, typically jobs.rb or worker.rb:
 
     job 'post.cleanup.all' do |args|
       Post.all.each do |post|
-        enqueue('post.cleanup', :id => post.all)
+        enqueue('post.cleanup', :id => post.id)
       end
     end
 
