@@ -5,12 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{stalker}
-  s.version = "0.8.0"
+  s.version = "0.9.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Adam Wiggins"]
-  s.date = %q{2011-03-11}
-  s.default_executable = %q{stalk}
+  s.date = %q{2011-04-12}
   s.description = %q{A job queueing and background workers system using Beanstalkd.  Inspired by the Minion gem.}
   s.email = %q{adam@heroku.com}
   s.executables = ["stalk"]
@@ -24,10 +23,10 @@ Gem::Specification.new do |s|
     "bin/stalk",
     "lib/stalker.rb"
   ]
-  s.homepage = %q{http://github.com/adamwiggins/stalker}
+  s.homepage = %q{https://github.com/han/stalker}
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{stalker}
-  s.rubygems_version = %q{1.5.0}
+  s.rubygems_version = %q{1.7.2}
   s.summary = %q{A job queueing and background workers system using Beanstalkd.}
   s.test_files = [
     "examples/enqueue.rb",
