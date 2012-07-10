@@ -13,7 +13,7 @@ module Stalker
 
   def enqueue(job, args={}, opts={})
     pri   = opts[:pri]   || 65536
-    delay = opts[:delay] || 0
+    delay = [0, opts[:delay].to_i].max  
     ttr   = opts[:ttr]   || 120
     beanstalk.use job
     beanstalk.put [ job, args ].to_json, pri, delay, ttr
@@ -48,7 +48,7 @@ module Stalker
       raise(NoSuchJob, job) unless @@handlers[job]
     end
 
-    log "Working #{jobs.size} jobs: [ #{jobs.join(' ')} ]"
+    log_info "Working #{jobs.size} jobs: [ #{jobs.join(' ')} ]"
 
     jobs.each { |job| beanstalk.watch(job) }
 
@@ -95,7 +95,7 @@ module Stalker
   rescue => e
     log_error exception_message(e)
     job.bury rescue nil
-    log_job_end(name, 'failed')
+		log_job_end(name, 'failed') if @job_begun
     if error_handler
       if error_handler.arity == 1
         error_handler.call(e)
@@ -121,17 +121,17 @@ module Stalker
       ''
     end
 
-    log [ "Working", name, args_flat ].join(' ')
+    log_info [ "Working", name, args_flat ].join(' ')
     @job_begun = Time.now
   end
 
   def log_job_end(name, failed=false)
     ellapsed = Time.now - @job_begun
     ms = (ellapsed.to_f * 1000).to_i
-    log "Finished #{name} in #{ms}ms #{failed ? ' (failed)' : ''}"
+    log_info "Finished #{name} in #{ms}ms #{failed ? ' (failed)' : ''}"
   end
 
-  def log(msg)
+  def log_info(msg)
     puts msg
   end
 
@@ -140,7 +140,7 @@ module Stalker
   end
 
   def beanstalk
-    @@beanstalk ||= Beanstalk::Pool.new([ beanstalk_host_and_port ])
+    @@beanstalk ||= Beanstalk::Pool.new(beanstalk_addresses)
   end
 
   def beanstalk_url
@@ -150,10 +150,15 @@ module Stalker
 
   class BadURL < RuntimeError; end
 
-  def beanstalk_host_and_port
-    uri = URI.parse(beanstalk_url)
-    raise(BadURL, beanstalk_url) if uri.scheme != 'beanstalk'
-    return "#{uri.host}:#{uri.port || 11300}"
+  def beanstalk_addresses
+    uris = beanstalk_url.split(/[\s,]+/)
+    uris.map {|uri| beanstalk_host_and_port(uri)}
+  end
+
+  def beanstalk_host_and_port(uri_string)
+    uri = URI.parse(uri_string)
+    raise(BadURL, uri_string) if uri.scheme != 'beanstalk'
+    "#{uri.host}:#{uri.port || 11300}"
   end
 
   def exception_message(e)

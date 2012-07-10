@@ -6,7 +6,7 @@ Jeweler::Tasks.new do |s|
 	s.description = "A job queueing and background workers system using Beanstalkd.  Inspired by the Minion gem."
 	s.author = "Adam Wiggins"
 	s.email = "adam@heroku.com"
-	s.homepage = "http://github.com/adamwiggins/stalker"
+	s.homepage = "https://github.com/han/stalker"
 	s.executables = [ "stalk" ]
 	s.rubyforge_project = "stalker"
 
